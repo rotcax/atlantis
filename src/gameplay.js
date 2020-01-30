@@ -1,18 +1,24 @@
-var game = new Phaser.Game(1136, 640, Phaser.AUTO);
+var game = new Phaser.Game(1136, 640, Phaser.CANVAS);
 
-GamePlayManager = {
-    init() {
-        console.log('init')
-    },
-    preload() {
-        console.log('preload')
-    },
-    create() {
-        console.log('create')
-    },
-    update() {
-        console.log('update')
-    }
+this.firstMouseDown = false;
+
+GamePlayManager = {  
+  init() {
+    scaleScenary(game);
+  },
+  preload() {
+    loadResource(game);
+  },
+  create() {
+    this.horse = prepareScenary(game);
+    game.input.onDown.add(this.onTap, this);
+  },
+  onTap() {
+    this.firstMouseDown = true;
+  },
+  update() {
+    keyAction(game, this.horse, this.firstMouseDown);
+  }
 }
 
 game.state.add('gameplay', GamePlayManager);
