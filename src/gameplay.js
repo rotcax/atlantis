@@ -2,12 +2,8 @@ var game = new Phaser.Game(1136, 640, Phaser.CANVAS);
 var AMOUNT_DIAMONDS = 30;
 
 GamePlayManager = {  
-  init() {
-    scaleScenary(game);
-  },
-  preload() {
-    loadResource(game);
-  },
+  init: () => scaleScenary(game),
+  preload: () => loadResource(game),
   create() {
     this.horse = prepareScenary(game);
 
