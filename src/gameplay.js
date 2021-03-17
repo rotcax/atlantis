@@ -30,6 +30,20 @@ GamePlayManager = {
         rectCurrentDiamond = this.getBoundsDiamond(diamond);
       }
     }
+
+    this.explosion = game.add.sprite(100, 100, 'explosion');
+
+    this.explosion.tweenScale = game.add.tween(this.explosion.scale).to({
+      x: [0.4, 0.8, 0.4],
+      y: [0.4, 0.8, 0.4]
+    }, 600, Phaser.Easing.Exponential.Out, false, 0, 0, false);
+
+    this.explosion.tweenAlpha = game.add.tween(this.explosion).to({
+      alpha: [1, 0.6, 0]
+    }, 600, Phaser.Easing.Exponential.Out, false, 0, 0, false);
+
+    this.explosion.anchor.setTo(0.5);
+    this.explosion.visible = false;
   },
   onTap() {
     this.firstMouseDown = true;
@@ -58,8 +72,47 @@ GamePlayManager = {
 
     return false;
   },
+  getBoundsHorse() {
+    const x0 = this.horse.x - Math.abs(this.horse.width / 2);
+    const width = this.horse.width;
+    const y0 = this.horse.y - this.horse.height / 2;
+    const height = this.horse.height;
+
+    return new Phaser.Rectangle(x0, y0, width, height);
+  },
   update() {
-    keyAction(game, this.horse, this.firstMouseDown);
+    if(this.firstMouseDown) {
+      const pointerX = game.input.x;
+      const pointerY = game.input.y;
+    
+      const distX = pointerX - this.horse.x;
+      const distY = pointerY - this.horse.y;
+    
+      if(distX > 0) {
+        this.horse.scale.setTo(1, 1);
+      } else {
+        this.horse.scale.setTo(-1, 1);
+      }
+    
+      this.horse.x += distX * 0.02;
+      this.horse.y += distY * 0.02;
+
+      for(var i = 0; i < AMOUNT_DIAMONDS; i++) {
+        const rectHorse = this.getBoundsHorse();
+        const rectDiamond = this.getBoundsDiamond(this.diamonds[i])
+  
+        if(this.diamonds[i].visible && this.isRectanglesOverlapping(rectHorse, rectDiamond)) {
+          this.diamonds[i].visible = false;
+
+          this.explosion.visible = true;
+          this.explosion.x = this.diamonds[i].x;
+          this.explosion.y = this.diamonds[i].y;
+
+          this.explosion.tweenScale.start();
+          this.explosion.tweenAlpha.start();
+        }
+      }
+    }
   }
 }
 
