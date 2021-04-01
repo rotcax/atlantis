@@ -17,6 +17,10 @@ GamePlayManager = {
   create() {
     game.add.sprite(0, 0, 'background');
 
+    this.mollusk = game.add.sprite(500, 150, 'mollusk');
+    this.shark = game.add.sprite(500, 20, 'shark');
+    this.fishes = game.add.sprite(100, 550, 'fishes');
+
     this.horse = game.add.sprite(0, 0, 'horse');
     this.horse.frame = 0;
     this.horse.x = game.width / 2;
@@ -77,6 +81,23 @@ GamePlayManager = {
 
     this.scoreText = game.add.text(game.width / 2, 40, '0', style);
     this.scoreText.anchor.setTo(0.5);
+
+    this.totalTime = 30;
+    this.timerText = game.add.text(1000, 40, `${this.totalTime} `, style);
+    this.timerText.anchor.setTo(0.5);
+
+    this.timerGameOver = game.time.events.loop(Phaser.Timer.SECOND, function() {
+      if(this.flagFirstMouseDown) {
+        this.totalTime--;
+        this.timerText.text = `${this.totalTime} `;
+
+        if(this.totalTime <= 0) {
+          game.time.events.remove(this.timerGameOver);
+          this.endGame = true;
+          this.showFinalMessage('GAME OVER');
+        }
+      }
+    }, this);
   },
   increaseScore() {
     this.currentScore += 100;
@@ -85,6 +106,7 @@ GamePlayManager = {
     this.amountDiamondCaught += 1;
 
     if(this.amountDiamondCaught >= AMOUNT_DIAMONDS) {
+      game.time.events.remove(this.timerGameOver);
       this.endGame = true;
       this.showFinalMessage('CONGRATULATIONS');
     }
@@ -107,6 +129,12 @@ GamePlayManager = {
     this.textFieldFinalMsg.anchor.setTo(0.5);
   },
   onTap() {
+    if(!this.flagFirstMouseDown) {
+      this.tweenMollusk = game.add.tween(this.mollusk.position).to({
+        y: -0.001
+      }, 5800, Phaser.Easing.Cubic.InOut, true, 0, 1000, true).loop(true);
+    }
+
     this.flagFirstMouseDown = true;
   },
   getBoundsDiamond(currentDiamond) {
@@ -143,6 +171,16 @@ GamePlayManager = {
   },
   update() {
     if(this.flagFirstMouseDown && !this.endGame) {
+      this.shark.x--;
+      if(this.shark.x < -300) {
+        this.shark.x = 1300;
+      }
+
+      this.fishes.x += 0.3;
+      if(this.fishes > 1300) {
+        this.fishes.x = -300;
+      }
+
       const pointerX = game.input.x;
       const pointerY = game.input.y;
     
