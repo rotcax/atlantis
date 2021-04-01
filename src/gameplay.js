@@ -1,5 +1,6 @@
 var game = new Phaser.Game(1136, 640, Phaser.CANVAS);
 var AMOUNT_DIAMONDS = 30;
+var AMOUNT_BOOBLES = 30;
 
 GamePlayManager = {  
   init() {
@@ -10,12 +11,28 @@ GamePlayManager = {
     this.flagFirstMouseDown = false;
     this.amountDiamondCaught = 0;
     this.endGame = false;
+
+    this.countSmile = -1;
   },
   preload() {
     loadResource(game)
   },
   create() {
     game.add.sprite(0, 0, 'background');
+
+    this.boobleArray = [];
+
+    for(let i = 0; i< AMOUNT_BOOBLES; i++) {
+      const xBooble = game.rnd.integerInRange(1, 1140);
+      const yBooble = game.rnd.integerInRange(600, 950);
+
+      const booble = game.add.sprite(xBooble, yBooble, 'booble' + game.rnd.integerInRange(1, 2));
+      booble.vel = 0.2 + game.rnd.frac() * 2;
+      booble.alpha = 0.9;
+      booble.scale.setTo(0.2 + game.rnd.frac());
+
+      this.boobleArray[i] = booble;
+    }
 
     this.mollusk = game.add.sprite(500, 150, 'mollusk');
     this.shark = game.add.sprite(500, 20, 'shark');
@@ -100,6 +117,9 @@ GamePlayManager = {
     }, this);
   },
   increaseScore() {
+    this.countSmile = 0;
+    this.horse.frame = 1;
+
     this.currentScore += 100;
     this.scoreText.text = this.currentScore;
 
@@ -171,6 +191,24 @@ GamePlayManager = {
   },
   update() {
     if(this.flagFirstMouseDown && !this.endGame) {
+      for(let i = 0; i < AMOUNT_BOOBLES; i++) {
+        const booble = this.boobleArray[i];
+        booble.y -= booble.vel;
+
+        if(booble.y < -50) {
+          booble.y = 700;
+          booble.x = game.rnd.integerInRange(1, 1140);
+        }
+      }
+
+      if(this.countSmile >= 0) {
+        this.countSmile++;
+        if(this.countSmile > 50) {
+          this.countSmile = -1;
+          this.horse.frame = 0;
+        }
+      }
+
       this.shark.x--;
       if(this.shark.x < -300) {
         this.shark.x = 1300;

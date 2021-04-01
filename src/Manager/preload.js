@@ -6,4 +6,6 @@ function loadResource(game) {
   game.load.image('shark', 'assets/images/shark.png');
   game.load.image('fishes', 'assets/images/fishes.png');
   game.load.image('mollusk', 'assets/images/mollusk.png');
+  game.load.image('booble1', 'assets/images/booble1.png');
+  game.load.image('booble2', 'assets/images/booble2.png');
 }
